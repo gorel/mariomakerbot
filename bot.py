@@ -78,7 +78,7 @@ def get_posted_levels(username):
     user = r.get_redditor(username)
     res = set()
 
-    comments_gen = user.get_comments()
+    comments_gen = user.get_comments(limit=100)
     for comment in comments_gen:
         if comment.subreddit.display_name.lower() == MARIOMAKER.lower():
             levels = get_levels(comment)
