@@ -76,9 +76,11 @@ def get_levels(comment):
 
 # Return the levels that a certain user has posted
 def get_posted_levels(username):
+    time.sleep(2)
     user = r.get_redditor(username)
     res = set()
 
+    time.sleep(2)
     comments_gen = user.get_comments(limit=100)
     for comment in comments_gen:
         if comment.subreddit.display_name.lower() == MARIOMAKER.lower():
@@ -204,27 +206,30 @@ def make_reply(comment, username, levels):
 
     reply_string += "\n\n*****\n\n"
     reply_string += "For questions about this bot, contact /u/Virule"
+    time.sleep(2)
     comment.reply(reply_string)
 
 
 # Start the bot
 def main():
     print('Bot started.')
-    comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
-    # Don't get rate limited!
-    time.sleep(1)
-    for comment in comments:
-        if not db_contains(comment.id):
-            user = get_requested_user(comment)
-            if user:
-                print('\nUser requested: {}'.format(user))
-                levels = get_posted_levels(user)
-                print('Found {} levels'.format(len(levels)))
-                # Don't get rate limited!
-                time.sleep(1)
-                make_reply(comment, user, levels)
-                print('Sent reply!')
-                db_add(comment.id)
+    while True:
+        # Don't get rate limited!
+        time.sleep(2)
+
+        comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
+        for comment in comments:
+            if not db_contains(comment.id):
+                user = get_requested_user(comment)
+                if user:
+                    print('\nUser requested: {}'.format(user))
+                    levels = get_posted_levels(user)
+                    print('Found {} levels'.format(len(levels)))
+                    # Don't get rate limited!
+                    time.sleep(2)
+                    make_reply(comment, user, levels)
+                    print('Sent reply!')
+                    db_add(comment.id)
 
 
 if __name__ == '__main__':
