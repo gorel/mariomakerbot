@@ -167,16 +167,21 @@ def format_level(level):
     details = get_level_details(level)
     # Round the completion rate to 2 decimal places
     tried = details['tried']
+    star = details['tried']
     try:
         tried = "{0:.2f}".format(tried)
+        star = "{0:.2f}".format(
+            100 * float(details['liked']) / details['played'],
+        )
     except:
         pass
 
-    return "{url}|{liked}|{played}|{tried}%\n".format(
+    return "{url}|{liked}|{played}|{tried}|{star}\n".format(
         url=details['url'],
         liked=details['liked'],
         played=details['played'],
         tried=tried,
+        star=star,
     )
 
 
@@ -191,8 +196,8 @@ def make_reply(comment, username, levels):
             "Try checking out some of these "
             "other recent levels posted by {name}!\n\n".format(name=username)
         )
-        reply_string += "URL|Liked|Played|Completion Rate\n"
-        reply_string += ":--|:--|:--|:--\n"
+        reply_string += "URL|Stars|Plays|Completion %|Star %\n"
+        reply_string += ":--|:--|:--|:--|:--\n"
         for level in levels:
             reply_string += format_level(level)
 
