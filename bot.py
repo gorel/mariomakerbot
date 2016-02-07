@@ -207,7 +207,13 @@ def make_reply(comment, username, levels):
     reply_string += "\n\n*****\n\n"
     reply_string += "For questions about this bot, contact /u/Virule"
     time.sleep(2)
-    comment.reply(reply_string)
+    while True:
+        try:
+            comment.reply(reply_string)
+            break
+        except praw.errors.RateLimitExceeeded as err:
+            print("Rate limit -- sleeping {} seconds".format(err.sleep_time))
+            time.sleep(err.sleep_time)
 
 
 # Start the bot
@@ -215,7 +221,8 @@ def main():
     print('Bot started.')
     while True:
         # Don't get rate limited!
-        time.sleep(2)
+        # Check for new messages every 30 seconds
+        time.sleep(30)
 
         comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
         for comment in comments:
