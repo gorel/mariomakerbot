@@ -83,11 +83,14 @@ def get_posted_levels(username):
 
     time.sleep(2)
     comments_gen = user.get_comments(limit=100)
-    for comment in comments_gen:
-        if comment.subreddit.display_name.lower() == MARIOMAKER.lower():
-            levels = get_levels(comment)
-            for level in levels:
-                res.add(level)
+    try:
+        for comment in comments_gen:
+            if comment.subreddit.display_name.lower() == MARIOMAKER.lower():
+                levels = get_levels(comment)
+                for level in levels:
+                    res.add(level)
+    except:
+        pass
 
     return res
 
@@ -133,6 +136,7 @@ def get_level_details(level):
         'liked': 0,
         'played': 0,
         'tried': 0.0,
+        'success': False,
     }
     found_slash = False
     numerator = 0
@@ -161,6 +165,7 @@ def get_level_details(level):
             details['tried'] = 'No tries yet!'
         else:
             details['tried'] = 100 * numerator / float(denominator)
+        details['success'] = True
     except urllib2.HTTPError:
         pass
     return details
@@ -169,6 +174,9 @@ def get_level_details(level):
 # Return a pretty formatted level string for a table row
 def format_level(level):
     details = get_level_details(level)
+    if not details['success']:
+        return ''
+
     # Round the completion rate to 2 decimal places
     tried = details['tried']
     star = details['tried']
