@@ -9,6 +9,7 @@
 import bs4
 import os
 import praw
+import praw.errors
 import praw.helpers
 import re
 import sqlalchemy
