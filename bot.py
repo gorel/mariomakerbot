@@ -13,6 +13,7 @@ import praw.helpers
 import re
 import sqlalchemy
 import sqlalchemy.orm
+import time
 import urllib2
 
 import OAuth2Util
@@ -209,13 +210,18 @@ def make_reply(comment, username, levels):
 # Start the bot
 def main():
     print('Bot started.')
-    for comment in praw.helpers.comment_stream(r, MARIOMAKER, limit=100):
+    comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
+    # Don't get rate limited!
+    time.sleep(1)
+    for comment in comments:
         if not db_contains(comment.id):
             user = get_requested_user(comment)
             if user:
                 print('\nUser requested: {}'.format(user))
                 levels = get_posted_levels(user)
                 print('Found {} levels'.format(len(levels)))
+                # Don't get rate limited!
+                time.sleep(1)
                 make_reply(comment, user, levels)
                 print('Sent reply!')
                 db_add(comment.id)
