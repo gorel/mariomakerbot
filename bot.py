@@ -51,7 +51,7 @@ def db_add(id):
 
 
 MARIOMAKER = 'MarioMaker'
-USER_MATCH_STRING = '\\+/u/{} (\\w+)'.format(os.environ['BOT_USERNAME'])
+USER_MATCH_STRING = '\\+/u/{} ([\\w-]+)'.format(os.environ['BOT_USERNAME'])
 USER_PATTERN = re.compile(USER_MATCH_STRING)
 
 LEVEL_MATCH_STRING = '\\w{4}-\\w{4}-\\w{4}-\\w{4}'
@@ -220,32 +220,37 @@ def make_reply(comment, username, levels):
         try:
             comment.reply(reply_string)
             break
-        except praw.errors.RateLimitExceeeded as err:
-            print("Rate limit -- sleeping {} seconds".format(err.sleep_time))
-            time.sleep(err.sleep_time)
+        except:
+            print("Rate limit -- sleeping 5 seconds")
+            time.sleep(5)
 
 
 # Start the bot
 def main():
     print('Bot started.')
     while True:
-        # Don't get rate limited!
-        # Check for new messages every 30 seconds
-        time.sleep(30)
+        try:
+            # Don't get rate limited!
+            # Check for new messages every 30 seconds
+            time.sleep(30)
 
-        comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
-        for comment in comments:
-            if not db_contains(comment.id):
-                user = get_requested_user(comment)
-                if user:
-                    print('\nUser requested: {}'.format(user))
-                    levels = get_posted_levels(user)
-                    print('Found {} levels'.format(len(levels)))
-                    # Don't get rate limited!
-                    time.sleep(2)
-                    make_reply(comment, user, levels)
-                    print('Sent reply!')
-                    db_add(comment.id)
+            print("Get new comments")
+            comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
+            for comment in comments:
+                if not db_contains(comment.id):
+                    user = get_requested_user(comment)
+                    if user:
+                        print('\nUser requested: {}'.format(user))
+                        levels = get_posted_levels(user)
+                        print('Found {} levels'.format(len(levels)))
+                        # Don't get rate limited!
+                        time.sleep(5)
+                        make_reply(comment, user, levels)
+                        print('Sent reply!')
+                        db_add(comment.id)
+        except:
+            print("Error getting comments. Try again")
+            pass
 
 
 if __name__ == '__main__':
