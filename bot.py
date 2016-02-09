@@ -70,15 +70,10 @@ def get_requested_user(comment):
 
 # Reply to a comment with the given levels
 def make_reply(comment, username, levels):
-    reply_string = "Couldn't find any recent level posts from {name}".format(
-        name=username,
-    )
+    reply_string = "Couldn't find any levels by {name}".format(name=username)
 
     if levels:
-        reply_string = (
-            "Try checking out some of these "
-            "other recent levels posted by {name}!\n\n".format(name=username)
-        )
+        reply_string = "Here are the ten most recent levels uploaded by {name}!\n\n".format(name=username)
         reply_string += "URL|Stars|Plays|Completion %|Star %\n"
         reply_string += ":--|:--|:--|:--|:--\n"
         for level in levels:
@@ -102,12 +97,19 @@ def main():
     while True:
         try:
             print("Get new comments")
-            for comment in praw.helpers.comment_stream(r, MARIOMAKER):
+            comments = praw.helpers.comment_stream(r, MARIOMAKER, limit=100)
+            for comment in comments:
                 if not models.comment_exists(comment.id):
                     user = get_requested_user(comment)
                     if user:
                         print('\nUser requested: {}'.format(user))
-                        levels = get_posted_levels(user)
+                        level_ids = models.Level.get_level_ids(user)
+                        print("Parsing levels from MM site")
+                        levels = []
+                        for level_id in level_ids:
+                            level = models.Level.parse(level_id)
+                            if level:
+                                levels.append(level)
                         print('Found {} levels'.format(len(levels)))
                         # Don't get rate limited!
                         time.sleep(5)
