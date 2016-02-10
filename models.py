@@ -61,6 +61,12 @@ def add_user(id):
     session.commit()
 
 
+def maker_url(name):
+    """Return a reddit-formatted URL to go to the maker's page"""
+    url = MAKER_URL.format(maker=name)
+    return "[{name}]({url})".format(name=name, url=url)
+
+
 class Comment(Base):
     __tablename__ = 'comments'
     id = Column('id', String(16), primary_key=True, index=True)

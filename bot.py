@@ -73,7 +73,13 @@ def make_reply(comment, username, levels):
     reply_string = "Couldn't find any levels by {name}".format(name=username)
 
     if levels:
-        reply_string = "Here are the ten most recent levels uploaded by {name}!\n\n".format(name=username)
+        reply_string = (
+            "Here are the {n} most recent "
+            "levels uploaded by {name}!\n\n".format(
+                n=len(levels),
+                name=models.maker_url(username),
+            )
+        )
         reply_string += "URL|Stars|Plays|Completion %|Star %\n"
         reply_string += ":--|:--|:--|:--|:--\n"
         for level in levels:
