@@ -6,6 +6,9 @@
 # Date: 2016-02-06
 #
 
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import praw
 import praw.helpers
@@ -18,7 +21,7 @@ import models
 
 
 MARIOMAKER = 'MarioMaker'
-USER_MATCH_STRING = '\\+/u/{} ([\\w-]+)'.format(os.environ['BOT_USERNAME'])
+USER_MATCH_STRING = '\\+/u/{} ([-\\w\\.]+)'.format(os.environ['BOT_USERNAME'])
 USER_PATTERN = re.compile(USER_MATCH_STRING)
 
 LEVEL_MATCH_STRING = '\\w{4}-\\w{4}-\\w{4}-\\w{4}'
@@ -92,8 +95,9 @@ def make_reply(comment, username, levels):
         try:
             comment.reply(reply_string)
             break
-        except:
+        except Exception as e:
             print("Rate limit -- sleeping 5 seconds")
+            print("Error: {}".format(str(e)))
             time.sleep(5)
 
 

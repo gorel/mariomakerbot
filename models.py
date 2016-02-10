@@ -6,6 +6,9 @@
 # Date: 2016-02-08
 #
 
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import bs4
 import os
 import re
@@ -114,13 +117,16 @@ class Level(object):
         """Get the 10 most recent level IDs from this NNID"""
         res = []
         url = MAKER_URL.format(maker=nnid)
-        page = urllib2.urlopen(url)
-        soup = bs4.BeautifulSoup(page, 'html5lib')
-        links = soup.find_all('a', class_='course-detail')
-        for link in links:
-            match = COURSE_PATTERN.search(link['href'])
-            if match:
-                res.append(match.group(1))
+        try:
+            page = urllib2.urlopen(url)
+            soup = bs4.BeautifulSoup(page, 'html5lib')
+            links = soup.find_all('a', class_='course-detail')
+            for link in links:
+                match = COURSE_PATTERN.search(link['href'])
+                if match:
+                    res.append(match.group(1))
+        except urllib2.HTTPError:
+            pass
         return res
 
 
@@ -150,6 +156,8 @@ class Level(object):
     def get_level_url(cls, soup, url):
         """Get the bookmark URL for a level"""
         name = soup.find('div', class_='course-title').getText()
+        print("Name: {}".format(name))
+        print("URL: {}".format(url))
         return "[{name}]({url})".format(name=name, url=url)
 
 
